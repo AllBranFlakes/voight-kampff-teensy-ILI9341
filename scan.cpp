@@ -17,9 +17,10 @@ void Scan::generateInceptDate(){
 }
 
 //  Simple 0 or 1 function to set the boolean isReplicant. Uses analogRead on Pin 0 to get a random number without needing to call
+
 //  random(), which took up more memory.
 void Scan::generateHumanOrReplicant(){
-  isReplicant = random(0,2); //  True or false.
+  isReplicant = random(2); //  True or false.
   if(year>=36){ //  Nexus 6 had a 4-year lifespan, all dead by now. Nexus 7 was probably just Rachael? Nexus 8 were pre-blackout, and Nexus 9 started after 2036.
     nexusGen = 9;
   } else {
@@ -28,7 +29,7 @@ void Scan::generateHumanOrReplicant(){
 }
 
 void Scan::generateSummaryGender(){
-  isMale = random(0,2);   //  True or false.
+  isMale = random(2);   //  True or false.
 }
 
 void Scan::generateStateCharacters(){
@@ -37,25 +38,25 @@ void Scan::generateStateCharacters(){
 }
 
 void Scan::generateThumbprintData(){
-  leftPrintIndex = random(0,5);
-  rightPrintIndex = random(0,5);
+  leftPrintIndex = random(1,5);
+  rightPrintIndex = random(1,5);
   while(rightPrintIndex == leftPrintIndex){    // We want to make sure we get two different thumbprint images, so index1 can't equal index2.
-    rightPrintIndex = random(0,5);
+    rightPrintIndex = random(1,5);
   }
-  if(random(0,100)>90){
+  if(random(0,100)>95){
     leftPrintIndex = 255;
   }
-  if(random(0,100)>90){
+  if(random(0,100)>95){
     rightPrintIndex = 255;
   }
 }
 
 char Scan::randomStateCharacter(){
-  if(random(0,100)<90){ //  Rough 90% chance filter here - A, B, or C will follow
-    return statLetters[random(0,3)];
-  } else { // Rough 10% chance of an S, D, F, or ?
-    return statLetters[random(0,3)+3];
-  }
+ // if(random(0,100)<90){ //  Rough 90% chance filter here - A, B, or C will follow
+ // return statLetters[random(3)];
+ //} else { // Rough 10% chance of an S, D, F, or ?
+    return statLetters[random(6)];
+ //}
 }
 
 void Scan::generateReplicantID(){
@@ -71,23 +72,23 @@ void Scan::generateReplicantID(){
 //  Derives a first name and last name from the tables in names.h, then combines them and sets the value of summaryName to the result.
 void Scan::generateSummaryName(){
     byte first;
-    if(isMale){
-      first = random(0,23); //generate a number to pick a random first name from the array in names.h
-      strcpy_P(summaryName, (char*)pgm_read_word(&(firstNameMale[first])));
+    if (isMale){
+      first = random(1,23); //generate a number to pick a random first name from the array in names.h
+      strcpy_P(summaryName, (char*)(firstNameMale[first]));
     } else {
-      first = random(0,23);
-      strcpy_P(summaryName, (char*)pgm_read_word(&(firstNameFemale[first])));
+      first = random(1,23);
+      strcpy_P(summaryName, (char*)(firstNameFemale[first]));
     }
     strcat(summaryName, " ");
-    byte last = random(0,48); //  generate a number to pick a random last name from the array in names.h
-    strcat_P(summaryName,(char*)pgm_read_word(&(lastName[last])));
-    strcat(summaryName,'\0'); //  summaryName has now been assembled into [Firstname][space][Lastname]
+    byte last = random(1,48); //  generate a number to pick a random last name from the array in names.h
+    strcat_P(summaryName,(char*)(lastName[last]));
+    strcat(summaryName,"\0"); //  summaryName has now been assembled into [Firstname][space][Lastname]
     Serial.println(summaryName);
 }
 
 //  Simple 0 or 1 function to set the boolean isCriminal.
 void Scan::generateCriminalStatus(){
-  isCriminal = random(0,2);   //  True or false.
+  isCriminal = random(2);   //  True or false.
 }
 //////////////////////////////////
 //  WRITING FUNCTIONS
@@ -177,17 +178,17 @@ void Scan::writeFunction(int xPos, int yPos, int summaryWidth){
   tft->setCursor(xPos, yPos);
   char buffer[30];
   //  Generate a number to use as an index to read the functions[] char array in names.h
-  byte functionIndex = random(0,21);
+  byte functionIndex = random(1,21);
   //  Print a variable field name depending on if the target is human or replicant.
   if(isReplicant){
     tft->print(F("FUNCTION"));
-    strcpy_P(buffer,(char*)pgm_read_word(&(professionReplicant[functionIndex])));
+    strcpy_P(buffer,(char*)(professionReplicant[functionIndex]));
     byte textX = xPos+summaryWidth-strlen(buffer)*6;
     tft->setCursor(textX, yPos);
     tft->print(buffer);
   } else {
     tft->print(F("PROFESSION"));
-    strcpy_P(buffer,(char*)pgm_read_word(&(professionHuman[functionIndex])));
+    strcpy_P(buffer,(char*)(professionHuman[functionIndex]));
     byte textX = xPos+summaryWidth-strlen(buffer)*6;
     tft->setCursor(textX, yPos);
     tft->print(buffer);
@@ -257,7 +258,7 @@ void Scan::writeArrestStatus(int xPos, int yPos, int summaryWidth){
     tft->print(buffer);
     //  Generate a fake warrant number, five digits, each between 1 and 9.
     for(byte i = 0; i<5; i++){
-      tft->print(random(1,10));
+      tft->print(random(0,10));
     }
   } else {
     char buffer[30];
@@ -271,20 +272,20 @@ void Scan::writeArrestStatus(int xPos, int yPos, int summaryWidth){
 void Scan::writeCrimes(int xPos, int yPos, int summaryWidth){
   //  Add a separation line between this text and the text above it.
   drawLineAboveText(xPos, yPos, summaryWidth);
-  byte crimeCount = analogRead(0)%2+1; //(1-2)
-  byte crimeIndex1 = random(0,15);
-  byte crimeIndex2 = random(0,15);
+  byte crimeCount = random(1,3); //(1-2)
+  byte crimeIndex1 = random(1,15);
+  byte crimeIndex2 = random(1,15);
   while(crimeIndex2 == crimeIndex1){
-    crimeIndex2 = random(0,15);
+    crimeIndex2 = random(1,15);
   }
   //By this point, we should have three unique indicies for the crimes.
   char crimeBuffer[39];
-  strcpy_P(crimeBuffer, (char*)pgm_read_word(&(crimeList[crimeIndex1])));
+  strcpy_P(crimeBuffer, (char*)(crimeList[crimeIndex1]));
   if(crimeCount > 1){
     strcat(crimeBuffer, " / ");
-    strcat_P(crimeBuffer,(char*)pgm_read_word(&(crimeList[crimeIndex2])));
+    strcat_P(crimeBuffer,(char*)(crimeList[crimeIndex2]));
   }
-  strcat(crimeBuffer, '\0');
+  strcat(crimeBuffer, "\0");
   //  Full crime list string generated. Calculate width and right-align.
   byte textX = xPos+summaryWidth-(strlen(crimeBuffer)*6);
   tft->setCursor(textX, yPos);

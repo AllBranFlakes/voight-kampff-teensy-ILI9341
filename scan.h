@@ -10,9 +10,9 @@ class Scan
   public:
     Scan(ILI9341_t3 &tftdev, UI &uidev);
     char summaryName[22];
-    bool isReplicant;
-    bool isMale;
-    bool isCriminal;
+    boolean isReplicant;
+    boolean isMale;
+    boolean isCriminal;
     ILI9341_t3 *tft;
     UI *ui;
     byte nexusGen;

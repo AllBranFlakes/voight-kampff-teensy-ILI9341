@@ -18,12 +18,17 @@
 #define TFT_MISO 12
 #define TFT_RST 8
 #define TFT_CLK 13 //Arduino SCK
-#define TFT_LCD 6
 
 #define TONE_PIN 3
+#define TRIG_PIN 4
+int redPin = 21;
+int greenPin = 22;
+int bluePin = 23;
+#define RLED_PIN 20
+
 
 //  We need to construct the TFT screen object from the library in order to start, you know, doing stuff to it. Better late than never.
-ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC, TFT_RST, TFT_MOSI, TFT_CLK, TFT_MISO, TFT_LCD);
+ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC, TFT_RST, TFT_MOSI, TFT_CLK, TFT_MISO);
 
 //  Construct a UI object that points at the TFT so it knows how to draw.
 UI ui(240, 320, 4, MEDBLUEUI, tft);
@@ -43,6 +48,8 @@ Analysis blips(ui.leftMargin+3, ui.topLeftHeight+3, ui.vertGutterLeft-ui.leftMar
 bool showStartScreen = true;
 elapsedMillis logoStartFadeTimer;
 int screenBrightness = 0;
+int triggerState = 0;
+int lastTriggerState = 0;
 
 uint8_t use_fb = 1;
 uint8_t use_clip_rect = 0;
@@ -52,44 +59,81 @@ uint8_t use_set_origin = 0;
 #define ORIGIN_TEST_Y 0
 
 void setup() {
+  pinMode(TRIG_PIN, INPUT);
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
+  pinMode(RLED_PIN, OUTPUT);
+  digitalWrite(RLED_PIN, HIGH);
+  
   Serial.begin(115200);
-  //  Don't do anything until the Serial communication is established. Remove this when finalizing code.
-  while(!Serial);
   //  Randomize the seed
   randomSeed(analogRead(0));
-  //tft.setBrightness(0);
+  // tft.setBrightness(0);
   tft.begin();
   initializeFlashEffect();
   SetupOrClearClipRectAndOffsets();
   tft.fillScreen(BACKGROUND);
   tft.setBrightness(255);
 
-  /*for(int i = 0; i<=ui.screenHeight/2; i+=20){
+  for(int i = 0; i<=ui.screenHeight/2; i+=20){
     tft.setClipRect(0,ui.screenHeight/2-i, ui.screenWidth, i*2);
     ui.startLAPDScreen();
-  }*/
+  }
 
-  //delay(1000);
-  //tft.fillScreen(BACKGROUND);
-  //tft.setBrightness(120);
-  //ui.drawMainUIGrid();
-  //bat.drawBattery();
-  //ui.drawAwaitingText(MEDBLUEUI);  //  Text to show in the bottom field while idle
-  //delay(5000);  //  Temporary delay until fake "Scan"
-  //scanTarget(); //  Runs collection of functions following the completion of a scan
-  //delay(10000);
-  //showUserProfile();
+  delay(3000);
+  tft.fillScreen(BACKGROUND);
+  tft.setBrightness(120);
+  ui.drawMainUIGrid();
+  bat.drawBattery();
+  ui.drawAwaitingText(MEDBLUEUI);  //  Text to show in the bottom field while idle
+  // delay(2000);  //  Temporary delay until fake "Scan"
+  // scanTarget(); //  Runs collection of functions following the completion of a scan
+  // delay(10000);
+  // showUserProfile();
 }
 
 void loop() {
+ triggerState = digitalRead(TRIG_PIN);
 
+  // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
+  if(triggerState != lastTriggerState){
+    if (triggerState == HIGH) {
+      // scan target
+      setColor(255,255,255);
+      delay(200);
+      setColor(0,0,255);
+      delay(200);
+      setColor(255,255,255);
+      delay(200);
+      
+      while (digitalRead(TRIG_PIN) == HIGH) {
+        tone(TONE_PIN, random(2000,3000), 10);
+        setColor(random(255), random(255), random(255)); 
+        delay(50);   
+      }
+      noTone(TONE_PIN);
+      setColor(0,0,0);     
+    }else{
+      // print scan results
+      scanTarget();
+      delay(5000);
+      tft.fillScreen(BACKGROUND);
+      tft.setBrightness(120);
+      ui.drawMainUIGrid();
+      bat.drawBattery();
+      ui.drawAwaitingText(MEDBLUEUI);
+    }
+  }
+  lastTriggerState = triggerState;
 }
 
 void initializeFlashEffect(){
   //  Audio and brightness timers for the startup animation
   elapsedMillis freqTimer, brightnessTimer;
-  int startFreq, currentFreq = 3000;
-  int endFreq = 22000;
+  int startFreq = 1500;
+  int currentFreq = 1500;
+  int endFreq = 11000;
   int freqStep = (endFreq-startFreq)/255;
   int currentBrightness = 255;
   bool initialized = false;
@@ -120,16 +164,16 @@ void initializeFlashEffect(){
   }
 }
 
-/*void drawGlitch(){
+void drawGlitch(){
   int w = random(20,80);
   int h = random(10,40);
-  int x = random(0,screenWidth-80);
-  int y = random(0,screenHeight-40);
+  int x = random(0,240-80);
+  int y = random(0,320-40);
   uint16_t pixelColorArray[(3 * w * h)+3];
   tft.readRect(x, y, w, h, pixelColorArray);
   tft.fillRect(x,y,w,h-1,REDUI);
   tft.writeRect(x,y,w,h-1,pixelColorArray);
-}*/
+}
 
 void showUserProfile(){
   tft.fillScreen(BACKGROUND);
@@ -232,4 +276,12 @@ void SetupOrClearClipRectAndOffsets() {
     else
       tft.setOrigin();
   }
+}
+
+// rgb led section
+void setColor(int red, int green, int blue)
+{
+  analogWrite(redPin, red);
+  analogWrite(greenPin, green);
+  analogWrite(bluePin, blue);  
 }

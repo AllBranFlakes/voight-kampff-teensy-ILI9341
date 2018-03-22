@@ -57,19 +57,19 @@ void Profile::generateSecurityCode(){
     char buffer[13];
     char tempUserName[25];
     strcpy_P(tempUserName, userName[userSelect]);
-    randomSeed(hash((unsigned char*)tempUserName)); //  This should make it so it generates the same numbers consistently?
-    sprintf(buffer,"%d%d%d%d%d-%c-%d%d%d%d", random(0,10), random(0,10), random(0,10), random(0,10), random(0,10), tempUserName[0], random(0,10), random(0,10), random(0,10), random(0,10));
+    //randomSeed(hash((unsigned char*)tempUserName)); //  This should make it so it generates the same numbers consistently?
+    sprintf(buffer,"%d%d%d%d%d-%c-%d%d%d%d", 4, 6, 2, 4, 7, tempUserName[0], 2, 2, 3, 7);
     strcpy(securityCode, buffer);
   }
 }
 
-unsigned long Profile::hash(unsigned char *str){
-  unsigned long hash = 5381;
-  int c;
-  while (c = *str++)
-      hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-  return hash;
-}
+//unsigned long Profile::hash(unsigned char *str){
+//  unsigned long hash = 5381;
+//  int c;
+//  while (c = *str++)
+//      hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+// return hash;
+//}
 
 void Profile::writeUserData(uint16_t color){
   writeProfileName(color);
@@ -92,7 +92,7 @@ void Profile::writeProfileName(uint16_t color){
   tft->setCursor(leftTextX, leftTextY+12);
   tft->setTextColor(LIGHTBLUEUI);
   tft->setTextSize(2);
-  tft->print((char*)pgm_read_word(&(userName[userSelect])));
+  tft->print((char*)(userName[userSelect]));
   tft->setTextSize(1);
 }
 
@@ -155,7 +155,7 @@ void Profile::writeUserDetails(uint16_t color){
   tft->setTextColor(LIGHTBLUEUI);
   char bladeRunnerText[] = "BLADE RUNNER";
   byte tempX = textX;
-  for(int i = 0; i<strlen(bladeRunnerText); i++){
+  for(int i = 0; i<12; i++){
     tft->print(bladeRunnerText[i]);
     tempX += 7;
     tft->setCursor(tempX, textY);

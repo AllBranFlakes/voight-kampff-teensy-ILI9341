@@ -18,8 +18,10 @@
 #define WHITE        0xFFFF
 #define BACKGROUND   0x0862
 #define DARKBLUEUI   0x10E4
+//#define DARKBLUEUI   0xF81F
 #define MEDBLUEUI    0x430D
 #define LIGHTBLUEUI  0x9576
+//#define LIGHTBLUEUI  0x8010
 #define REDUI        0x9184
 #define GLOWEDGECOLOR 0x21A7
 
@@ -27,6 +29,7 @@
 #define EYECOLOR2 0x2A6A
 #define EYECOLOR3 0x4C53
 #define EYECOLOR4 0x7DF9
+
 
 #define ANALYSIS1    0x2208
 #define ANALYSIS2    0x7C52

@@ -291,12 +291,12 @@ void UI::drawRecordBox(int x, int y, bool strike, uint16_t color){
 
 void UI::drawThumbprints(byte leftPrintIndex, byte rightPrintIndex){
   if(rightPrintIndex != 255){
-    tft->drawBitmap((vertGutterLeft-vertPrintBar)/2+vertPrintBar-16, topGutterY+12, (uint8_t*)pgm_read_word(&(thumbImages[rightPrintIndex])), 32, 44, MEDBLUEUI);
+    tft->drawBitmap((vertGutterLeft-vertPrintBar)/2+vertPrintBar-16, topGutterY+12, (uint8_t*)(thumbImages[rightPrintIndex]), 32, 44, MEDBLUEUI);
   } else {
     drawXMark((vertGutterLeft-vertPrintBar)/2+vertPrintBar-5, (horizPrintBar-topGutterY)/2+topGutterY-5, 10, 10, 2, MEDBLUEUI);
   }
   if(leftPrintIndex != 255){
-    tft->drawBitmap((vertPrintBar-leftMargin)/2+leftMargin-16, topGutterY+12, (uint8_t*)pgm_read_word(&(thumbImages[leftPrintIndex])), 32, 44, MEDBLUEUI);
+    tft->drawBitmap((vertPrintBar-leftMargin)/2+leftMargin-16, topGutterY+12, (uint8_t*)(thumbImages[leftPrintIndex]), 32, 44, MEDBLUEUI);
   } else {
     drawXMark((vertPrintBar-leftMargin)/2+leftMargin-5, (horizPrintBar-topGutterY)/2+topGutterY-5, 10, 10, 2, MEDBLUEUI);
   }
@@ -371,8 +371,8 @@ void UI::drawXMark(int xPos, int yPos, int markWidth, int markHeight, int lineWi
 }
 
 void UI::drawDNASamples(int xPos, int yPos, bool isReplicant){
-  //tft.fillRect(xPos, yPos-23, 115, 20, DARKBLUEUI);   //  Background area for the DNA field
-  //tft->drawBitmap(xPos-2, yPos-23, dnaStrand, 120, 20, MEDBLUEUI);   //  Draws DNA Bitmap
+ // tft->fillRect(xPos, yPos-23, 115, 20, DARKBLUEUI);   //  Background area for the DNA field
+ // tft->drawBitmap(xPos-2, yPos-23, dnaStrand, 120, 20, MEDBLUEUI);   //  Draws DNA Bitmap
   tft->drawBitmap(xPos, yPos, GCAT, 8 , 30, ANALYSIS1);  //  Draws super-small GCAT letters. Bitmap was the most data efficient way.
   xPos = xPos+8;
   for(int i = 0; i<4; i++){
