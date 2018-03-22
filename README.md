@@ -1,4 +1,13 @@
-# voight-kampff-teensy-ILI9341
-Code for my portable Voight-Kampff scanner from Blade Runner 2049, running on a Teensy 3.2 and ILI9341 display.
+# voight-kampff-teensy-ILI9340C
+Adapted code for Voight-Kampff scanner prop.
 
-https://www.fusedcreations.com/category/props/bladerunner/
+Refactored and cleaned for Teensy3.2 optimisation using ILI9340C 2.2" display. 
+
+To be completed:
++ SD card support
++ OV7670 camera support
++ Operator menu
+
+Forked from jamsessionein (https://www.fusedcreations.com/category/props/bladerunner/)
+
+
